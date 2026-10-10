@@ -1,0 +1,188 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Корзина — PC WEB{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold mb-0">
+            <i class="bi bi-cart3 me-2 text-primary"></i>Корзина
+        </h1>
+        {% if user.is_authenticated and cart %}
+        <span class="text-muted">{{ cart|length }} товар{{ cart|length|pluralize:" ,а,ов" }}</span>
+        {% endif %}
+    </div>
+
+    {% if not user.is_authenticated %}
+    <!-- Запретный плод для гостей -->
+    <div class="text-center py-5">
+        <div class="mb-4 position-relative d-inline-block">
+            <i class="bi bi-cart-x text-muted" style="font-size: 5rem; opacity: 0.3;"></i>
+            <i class="bi bi-lock-fill position-absolute top-50 start-50 translate-middle text-warning"
+               style="font-size: 2rem;"></i>
+        </div>
+        <h3 class="h4 mb-2">Корзина недоступна</h3>
+        <p class="text-muted mb-4" style="max-width: 440px; margin: 0 auto;">
+            Чтобы добавлять товары и оформлять заказы, нужно войти в аккаунт
+            или зарегистрироваться.
+        </p>
+        <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <a href="{% url 'main:login' %}" class="btn btn-primary">
+                <i class="bi bi-person me-1"></i> Войти
+            </a>
+            <a href="{% url 'main:register' %}" class="btn btn-outline-primary">
+                Регистрация
+            </a>
+        </div>
+    </div>
+
+    {% elif cart %}
+    <!-- Авторизован + есть товары -->
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 1rem;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 cart-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Товар</th>
+                                <th scope="col" class="text-center">Цена</th>
+                                <th scope="col" class="text-center">Кол-во</th>
+                                <th scope="col" class="text-center">Сумма</th>
+                                <th scope="col" class="text-end pe-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in cart %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}"
+                                             alt="{{ item.product.name }}"
+                                             class="rounded">
+                                        {% else %}
+                                        <div class="bg-body-secondary rounded d-flex align-items-center justify-content-center"
+                                             style="width: 64px; height: 64px;">
+                                            <i class="bi bi-image text-muted"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <a href="{% url 'main:product_detail' item.product.id item.product.slug %}"
+                                               class="fw-medium text-decoration-none text-body">
+                                                {{ item.product.name }}
+                                            </a>
+                                            {% if item.product.category %}
+                                            <div class="small text-muted">{{ item.product.category.name }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    {% if item.product.discount_price and item.product.discount_price < item.product.price %}
+                                    <span class="fw-medium">{{ item.product.discount_price }} $</span>
+                                    {% else %}
+                                    <span class="fw-medium">{{ item.price }} $</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <form action="{% url 'main:cart_add' item.product.id %}"
+                                          method="post"
+                                          class="d-inline-flex align-items-center gap-1 justify-content-center">
+                                        {% csrf_token %}
+                                        <input type="number"
+                                               name="quantity"
+                                               value="{{ item.quantity }}"
+                                               min="1"
+                                               max="20"
+                                               class="form-control form-control-sm text-center"
+                                               style="width: 70px;"
+                                               onchange="this.form.submit()">
+                                        <input type="hidden" name="override" value="True">
+                                    </form>
+                                </td>
+                                <td class="text-center fw-semibold">
+                                    {{ item.total_cost }} $
+                                </td>
+                                <td class="text-end pe-4">
+                                    <form action="{% url 'main:cart_remove' item.product.id %}" method="post" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                title="Удалить"
+                                                onclick="return confirm('Удалить товар из корзины?')">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="{% url 'main:product_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Продолжить покупки
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="border-radius: 1rem; top: 80px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Итого</h5>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Товары ({{ cart|length }})</span>
+                        <span>{{ cart.get_total_price }} $</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Доставка</span>
+                        <span class="text-success">Бесплатно</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold fs-5">К оплате</span>
+                        <span class="fw-bold fs-5 text-primary">{{ cart.get_total_price }} $</span>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-lg w-100 mb-3" id="checkoutBtn">
+                        <i class="bi bi-bag-check me-2"></i>Оформить заказ
+                    </button>
+
+                    <p class="text-muted small text-center mb-0">
+                        Нажимая на эту кнопку вы совершите заказ
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Авторизован, но корзина пуста -->
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h3 class="h4 text-muted mb-2">Корзина пуста</h3>
+        <p class="text-muted mb-4">Добавьте товары из каталога, чтобы начать оформление</p>
+        <a href="{% url 'main:product_list' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-grid me-2"></i>Перейти в каталог
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('checkoutBtn')?.addEventListener('click', function() {
+        alert('Функция оформления заказа будет добавлена позже.\nСейчас это заготовка.');
+    });
+</script>
+{% endblock %}
