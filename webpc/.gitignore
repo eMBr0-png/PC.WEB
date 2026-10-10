@@ -1,8 +1,12 @@
-.venv
-venv
+.venv/
+venv/
+.pylintrc
 __pycache__/
 
 .env
+.vscode
+.idea
 
 
 media/
+products/
