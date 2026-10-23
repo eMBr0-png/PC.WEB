@@ -30,7 +30,13 @@
                             {% else %}
                             <span class="badge text-bg-warning mb-1">Ожидает оплаты</span>
                             {% endif %}
-                            <div class="fw-bold text-primary fs-5">{{ order.get_total_cost }} $</div>
+                            <div class="fw-bold text-primary fs-5 mb-2">{{ order.get_total_cost }} $</div>
+
+                            {% if not order.paid %}
+                            <a href="{% url 'main:order_pay' order.id %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-credit-card me-1"></i>Оплатить
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
 

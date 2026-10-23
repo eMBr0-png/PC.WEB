@@ -148,7 +148,6 @@ def order_create(request):
             stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
             session = stripe.checkout.Session.create(
-                payment_method_types=['card'],
                 line_items=[{
                     'price_data': {
                         'currency': 'eur',
@@ -160,10 +159,10 @@ def order_create(request):
                     'quantity': 1,
                 }],
                 mode='payment',
-                success_url=request.build_absolute_url(
+                success_url=request.build_absolute_uri(
                     reverse('main:order_success', args=[order.id])
                 ),
-                cancel_url=request.build_absolute_url(
+                cancel_url=request.build_absolute_uri(
                     reverse('main:order_create')
                 ),
                 metadata={
@@ -189,3 +188,37 @@ def order_success(request, order_id):
     order.paid = True
     order.save()
     return render(request, 'main/order/created.html', {'order': order})
+
+@login_required
+def order_pay(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    if order.paid:
+        messages.info(request, 'Этот заказ уже оплачен.')
+        return redirect('main:order_list')
+
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+    session = stripe.checkout.Session.create(
+        line_items=[{
+            'price_data': {
+                'currency': 'eur',
+                'product_data': {
+                    'name': f'Заказ №{order.id}',
+                },
+                'unit_amount': int(order.get_total_cost() * 100),
+            },
+            'quantity': 1,
+        }],
+        mode='payment',
+        success_url=request.build_absolute_uri(
+            reverse('main:order_success', args=[order.id])
+        ),
+        cancel_url=request.build_absolute_uri(
+            reverse('main:order_list')
+        ),
+        metadata={
+            'order_id': order.id
+        }
+    )
+    return redirect(session.url, code=303)
