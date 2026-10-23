@@ -86,3 +86,39 @@ class CartItem(models.Model):
     @property
     def total_cost(self):
         return self.get_cost()
+
+class Order(models.Model):
+    first_name = models.CharField('Имя', max_length=50)
+    last_name = models.CharField('Фамилия', max_length=50)
+    paid = models.BooleanField('Оплачено', default=False)
+    created = models.DateTimeField('Создан', auto_now_add=True)
+    updated = models.DateTimeField('Обновлен', auto_now=True)
+    email = models.EmailField('Почта')
+    phone = models.CharField('Номер телефона', max_length=20)
+    city = models.CharField('Город', max_length=100)
+    postal_code = models.CharField('Почтовый индекс', max_length=20)
+    address = models.CharField('Адрес', max_length=250)
+    user = models.ForeignKey('auth.User', related_name='orders', on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Пользователь')
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
+        ordering = ['-created']
+    
+    def __str__(self):
+        return f'Заказ {self.id}'
+    
+    def get_total_cost(self):
+        return sum(item.get_cost() for item in self.items.all())
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE)
+    price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField('Количество', default=1)
+
+    def __str__(self):
+        return str(self.id)
+    
+    def get_cost(self):
+        return self.price * self.quantity
