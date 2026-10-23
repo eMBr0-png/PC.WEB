@@ -1,0 +1,212 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Оформление заказа — PC WEB{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold mb-0">
+            <i class="bi bi-bag-check me-2 text-primary"></i>Оформление заказа
+        </h1>
+        <a href="{% url 'main:cart_detail' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Назад в корзину
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Форма -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm" style="border-radius: 1rem;">
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="fw-bold mb-4">
+                        <i class="bi bi-person-lines-fill me-2 text-primary"></i>Данные для доставки
+                    </h5>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label fw-medium">Имя</label>
+                                <input type="text"
+                                       name="{{ form.first_name.name }}"
+                                       id="{{ form.first_name.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.first_name.errors %}is-invalid{% endif %}"
+                                       value="{{ form.first_name.value|default:'' }}"
+                                       placeholder="Иван"
+                                       required>
+                                {% if form.first_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label fw-medium">Фамилия</label>
+                                <input type="text"
+                                       name="{{ form.last_name.name }}"
+                                       id="{{ form.last_name.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.last_name.errors %}is-invalid{% endif %}"
+                                       value="{{ form.last_name.value|default:'' }}"
+                                       placeholder="Иванов"
+                                       required>
+                                {% if form.last_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label fw-medium">Email</label>
+                                <input type="email"
+                                       name="{{ form.email.name }}"
+                                       id="{{ form.email.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.email.errors %}is-invalid{% endif %}"
+                                       value="{{ form.email.value|default:'' }}"
+                                       placeholder="email@example.com"
+                                       required>
+                                {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label fw-medium">Телефон</label>
+                                <input type="text"
+                                       name="{{ form.phone.name }}"
+                                       id="{{ form.phone.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.phone.errors %}is-invalid{% endif %}"
+                                       value="{{ form.phone.value|default:'' }}"
+                                       placeholder="+49 123 456789"
+                                       required>
+                                {% if form.phone.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.phone.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-12">
+                                <label for="{{ form.address.id_for_label }}" class="form-label fw-medium">Адрес</label>
+                                <input type="text"
+                                       name="{{ form.address.name }}"
+                                       id="{{ form.address.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.address.errors %}is-invalid{% endif %}"
+                                       value="{{ form.address.value|default:'' }}"
+                                       placeholder="Улица, дом, квартира"
+                                       required>
+                                {% if form.address.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.address.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="{{ form.postal_code.id_for_label }}" class="form-label fw-medium">Индекс</label>
+                                <input type="text"
+                                       name="{{ form.postal_code.name }}"
+                                       id="{{ form.postal_code.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.postal_code.errors %}is-invalid{% endif %}"
+                                       value="{{ form.postal_code.value|default:'' }}"
+                                       placeholder="12345"
+                                       required>
+                                {% if form.postal_code.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.postal_code.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-8">
+                                <label for="{{ form.city.id_for_label }}" class="form-label fw-medium">Город</label>
+                                <input type="text"
+                                       name="{{ form.city.name }}"
+                                       id="{{ form.city.id_for_label }}"
+                                       class="form-control form-control-lg {% if form.city.errors %}is-invalid{% endif %}"
+                                       value="{{ form.city.value|default:'' }}"
+                                       placeholder="Бонн"
+                                       required>
+                                {% if form.city.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.city.errors %}{{ error }}{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-2">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-credit-card me-2"></i>Перейти к оплате
+                            </button>
+                            <p class="text-muted small text-center mt-3 mb-0">
+                                После нажатия вы будете перенаправлены на безопасную страницу оплаты Stripe
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Итог заказа -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm sticky-top" style="border-radius: 1rem; top: 80px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Ваш заказ</h5>
+
+                    <div class="d-flex flex-column gap-3 mb-4">
+                        {% for item in cart %}
+                        <div class="d-flex align-items-center gap-3">
+                            {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}"
+                                 alt="{{ item.product.name }}"
+                                 class="rounded"
+                                 style="width: 56px; height: 56px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-body-secondary rounded d-flex align-items-center justify-content-center"
+                                 style="width: 56px; height: 56px;">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="fw-medium text-truncate">{{ item.product.name }}</div>
+                                <div class="small text-muted">{{ item.quantity }} × {{ item.price }} $</div>
+                            </div>
+                            <div class="fw-semibold text-nowrap">{{ item.total_cost }} $</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Товары ({{ cart|length }})</span>
+                        <span>{{ cart.get_total_price }} $</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Доставка</span>
+                        <span class="text-success">Бесплатно</span>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold fs-5">К оплате</span>
+                        <span class="fw-bold fs-5 text-primary">{{ cart.get_total_price }} $</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

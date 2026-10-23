@@ -115,15 +115,18 @@ def order_create(request):
     
     if request.method == 'POST':
         form = OrderCreationForm(request.POST)
+        
         if form.is_valid():
             for item in cart:
                 product = item['product']
+                
                 if item['quantity'] > product.quantity:
-                    message.error(
+                    messages.error(
                         request,
                         f'Недостаточно товара "{product.name}" на складе. В наличие только {product.quantity} шт.'
                     )
                     return redirect('main:cart_detail')
+            
             order = form.save(commit=False)
             if request.user.is_authenticated:
                 order.user = request.user
@@ -168,13 +171,13 @@ def order_create(request):
                 }
             )
             return redirect(session.url, code=303)
-        else:
-            form = OrderCreationForm()
+    else:
+        form = OrderCreationForm()
         
-        return render(request, 'main/order/create.html', {
-            'cart': cart,
-            'form': form
-        })
+    return render(request, 'main/order/create.html', {
+        'cart': cart,
+        'form': form
+    })
 
 @login_required
 def order_list(request):

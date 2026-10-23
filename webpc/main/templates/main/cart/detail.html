@@ -151,9 +151,9 @@
                         <span class="fw-bold fs-5 text-primary">{{ cart.get_total_price }} $</span>
                     </div>
 
-                    <button type="button" class="btn btn-primary btn-lg w-100 mb-3" id="checkoutBtn">
+                    <a href="{% url 'main:order_create' %}" class="btn btn-primary btn-lg w-100 mb-3">
                         <i class="bi bi-bag-check me-2"></i>Оформить заказ
-                    </button>
+                    </a>
 
                     <p class="text-muted small text-center mb-0">
                         Нажимая на эту кнопку вы совершите заказ
@@ -177,12 +177,4 @@
     </div>
     {% endif %}
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.getElementById('checkoutBtn')?.addEventListener('click', function() {
-        alert('Функция оформления заказа будет добавлена позже.\nСейчас это заготовка.');
-    });
-</script>
 {% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Мои заказы — PC WEB{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 fw-bold mb-0">
+            <i class="bi bi-receipt me-2 text-primary"></i>Мои заказы
+        </h1>
+    </div>
+
+    {% if orders %}
+    <div class="row g-4">
+        {% for order in orders %}
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 1rem;">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-1">Заказ #{{ order.id }}</h5>
+                            <div class="text-muted small">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                {{ order.created|date:"d.m.Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            {% if order.paid %}
+                            <span class="badge text-bg-success mb-1">Оплачен</span>
+                            {% else %}
+                            <span class="badge text-bg-warning mb-1">Ожидает оплаты</span>
+                            {% endif %}
+                            <div class="fw-bold text-primary fs-5">{{ order.get_total_cost }} $</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 small mb-3">
+                        <div class="col-sm-6 col-md-3">
+                            <div class="text-muted">Получатель</div>
+                            <div class="fw-medium">{{ order.first_name }} {{ order.last_name }}</div>
+                        </div>
+                        <div class="col-sm-6 col-md-3">
+                            <div class="text-muted">Телефон</div>
+                            <div class="fw-medium">{{ order.phone }}</div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div class="text-muted">Адрес</div>
+                            <div class="fw-medium">{{ order.address }}, {{ order.postal_code }} {{ order.city }}</div>
+                        </div>
+                    </div>
+
+                    {% if order.items.all %}
+                    <hr class="my-3">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Товар</th>
+                                    <th class="text-center">Кол-во</th>
+                                    <th class="text-end">Цена</th>
+                                    <th class="text-end">Сумма</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">{{ item.price }} $</td>
+                                    <td class="text-end fw-medium">{{ item.get_cost }} $</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="bi bi-receipt text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h3 class="h4 text-muted mb-2">Заказов пока нет</h3>
+        <p class="text-muted mb-4">Оформите первый заказ из каталога</p>
+        <a href="{% url 'main:product_list' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-grid me-2"></i>Перейти в каталог
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

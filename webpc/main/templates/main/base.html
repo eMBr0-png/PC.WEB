@@ -212,6 +212,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'main:product_list' %}">Каталог</a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'main:order_list' %}">Мои заказы</a>
+                    </li>
+                    {% endif %}
                 </ul>
 
                 <div class="d-flex align-items-center gap-2">
